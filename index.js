@@ -13,6 +13,7 @@ const upload = multer({ dest: `${__dirname}/uploads/` });
 const VALID_COLORS = ['#BE0039', '#FF4500', '#FFA800', '#FFD635', '#00A368', '#00CC78', '#7EED56', '#00756F', '#009EAA', '#2450A4', '#3690EA', '#51E9F4', '#493AC1', '#6A5CFF', '#811E9F', '#B44AC0', '#FF3881', '#FF99AA', '#6D482F', '#9C6926', '#000000', '#898D90', '#D4D7D9', '#FFFFFF'];
 
 var appData = {
+    nbPixelsReplaced: 0,
     currentMap: 'blank.png',
     mapHistory: [
         { file: 'blank.png', reason: 'Feuille blanche', date: 1648890843309 }
@@ -22,6 +23,11 @@ var appData = {
 if (fs.existsSync(`${__dirname}/data.json`)) {
     appData = require(`${__dirname}/data.json`);
 }
+
+setInterval(() => {
+    fs.writeFileSync(`${__dirname}/data.json`, JSON.stringify(appData));
+    console.log(`Nombres de pixels placés au total: ${appData.nbPixelsReplaced} pixels`);
+}, 120000);
 
 const server = app.listen(3987);
 const wsServer = new ws.Server({ server: server, path: '/api/ws' });
@@ -62,13 +68,13 @@ app.post('/updateorders', upload.single('image'), async (req, res) => {
             return
         }
 
-        if (pixels.data.length !== 8000000) {
-            res.send('L\'image doit etre de 2000x1000 !');
+        if (pixels.data.length !== 16000000) {
+            res.send('L\'image doit etre de 2000x2000 !');
             fs.unlinkSync(req.file.path);
             return;
         }
 
-        for (var i = 0; i < 2000000; i++) {
+        for (var i = 0; i < 4000000; i++) {
             const r = pixels.data[i * 4];
             const g = pixels.data[(i * 4) + 1];
             const b = pixels.data[(i * 4) + 2];
@@ -126,6 +132,7 @@ wsServer.on('connection', (socket) => {
             case 'placepixel':
                 const { x, y, color } = data;
                 if (x === undefined || y === undefined || color === undefined && x < 0 || x > 1999 || y < 0 || y > 1999 || color < 0 || color > 32) return;
+                appData.nbPixelsReplaced++;
                 console.log(`[${new Date().toLocaleString()}] Pixel placé: ${x}, ${y}: ${color}`);
                 break;
             default:

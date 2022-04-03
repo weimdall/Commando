@@ -39,6 +39,10 @@
             <h1 data-statistic="connectionCount" class="odometer large-statistic">0</h1>
             <h3>🇫🇷 Patriotes connectés 🇫🇷</h3>
         </div>
+        <div class="card-body text-center">
+            <h1 data-statistic="pixelSaved" class="odometer large-statistic">0</h1>
+            <h3>Pixels sauvés</h3>
+        </div>
     </div>
     <div class="card">
         <div class="card-body text-center">
@@ -70,6 +74,7 @@
                 const data = await res.json();
 
                 document.querySelector('[data-statistic=\'connectionCount\']').innerText = data.connectionCount;
+                document.querySelector('[data-statistic=\'pixelSaved\']').innerText = data.nbPixelsReplaced;
                 document.querySelector('.current-order').src = `/maps/${data.currentMap}`;
                 document.querySelector('.maphistory').innerHTML = data.mapHistory.reverse().map((item) => `<li class="list-group-item">
     <img height="250" style="border: 1px solid black;" src="/maps/${escapeHtml(item.file)}" />
