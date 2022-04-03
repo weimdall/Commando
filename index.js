@@ -53,7 +53,7 @@ app.get('/api/stats', (req, res) => {
 });
 
 app.post('/updateorders', upload.single('image'), async (req, res) => {
-    if (!req.body.reason || !req.body.password || req.body.password != process.env.PASSWORD) {
+    if (!req.body || !req.file || !req.body.reason || !req.body.password || req.body.password !== process.env.PASSWORD) {
         res.send('Erreur dans le formulaire !');
         fs.unlinkSync(req.file.path);
         return;
